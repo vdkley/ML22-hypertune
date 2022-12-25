@@ -1,0 +1,9 @@
+{
+  "data_dir": "/home/azureuser/ML22/ML22-hypertune/data/external/imdb-dataset",
+  "dropout": 0.17592633369240437,
+  "hidden_size": 27,
+  "input_size": 3,
+  "num_layers": 2,
+  "output_size": 20,
+  "tune_dir": "/home/azureuser/ML22/ML22-hypertune/models/ray"
+}

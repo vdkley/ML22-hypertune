@@ -6,9 +6,17 @@ authors = ["Pascal van der Kley <pascal@vdkley.nl>"]
 
 [tool.poetry.dependencies]
 python = ">=3.8,<3.11"
-ray = "^2.2.0"
+ray = {extras = ["tune"], version = "^2.1.0"}
 torch = "^1.13.1"
 filelock = "^3.8.2"
+pandas = "^1.5.2"
+gin-config = "^0.5.0"
+tensorflow = "^2.11.0"
+loguru = "^0.6.0"
+torchvision = "^0.14.1"
+tqdm = "^4.64.1"
+pydantic = "^1.10.2"
+hpbandster = "^0.7.4"
 
 
 [tool.poetry.group.dev.dependencies]

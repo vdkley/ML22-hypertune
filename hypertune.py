@@ -4,16 +4,19 @@ from typing import Dict
 import ray
 import torch
 from filelock import FileLock
+
 # from loguru import logger
 from ray import tune
 from ray.tune import CLIReporter
+
 # from ray.tune import JupyterNotebookReporter
 # from ray.tune.schedulers import AsyncHyperBandScheduler
 from ray.tune.schedulers.hb_bohb import HyperBandForBOHB
 from ray.tune.search.bohb import TuneBOHB
-from src.data import make_dataset
 from src.models import metrics, rnn_models, train_model
 from src.settings import SearchSpace
+
+from src.data import make_dataset
 
 
 def train(config: Dict, checkpoint_dir: str = None) -> None:
@@ -27,14 +30,12 @@ def train(config: Dict, checkpoint_dir: str = None) -> None:
     # access the datadir
     data_dir = config["data_dir"]
     with FileLock(data_dir / ".lock"):
-        trainloader, testloader = make_dataset.get_gestures(
-            data_dir=data_dir, split=0.8, batchsize=32
-        )
+        trainloader, testloader = make_dataset.get_imdb_data(data_dir=data_dir)
 
     # we set up the metric
     accuracy = metrics.Accuracy()
     # and create the model with the config
-    model = rnn_models.GRUmodel(config)
+    model = rnn_models.AttentionNLP(config)
 
     # and we start training.
     # because we set tunewriter=True
@@ -69,7 +70,7 @@ if __name__ == "__main__":
         input_size=3,
         output_size=20,
         tune_dir=Path("models/ray").resolve(),
-        data_dir=Path("data/external/gestures-dataset").resolve(),
+        data_dir=Path("data/external/imdb-dataset").resolve(),
     )
 
     reporter = CLIReporter()
