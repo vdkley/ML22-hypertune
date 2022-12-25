@@ -22,7 +22,7 @@ from src.models.metrics import Metric
 from src.typehinting import GenericModel
 
 
-def write_gin(dir: Path, txt) -> None:
+def write_gin(dir: Path, txt: str) -> None:
     path = dir / "saved_config.gin"
     with open(path, "w") as file:
         file.write(txt)

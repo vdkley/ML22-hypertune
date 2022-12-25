@@ -13,10 +13,10 @@ from ray.tune import CLIReporter
 # from ray.tune.schedulers import AsyncHyperBandScheduler
 from ray.tune.schedulers.hb_bohb import HyperBandForBOHB
 from ray.tune.search.bohb import TuneBOHB
-from src.models import metrics, rnn_models, train_model
-from src.settings import SearchSpace
 
 from src.data import make_dataset
+from src.models import metrics, rnn_models, train_model
+from src.settings import SearchSpace
 
 
 def train(config: Dict, checkpoint_dir: str = None) -> None:
