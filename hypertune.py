@@ -1,24 +1,25 @@
-from src.data import make_dataset
-from src.models import rnn_models, metrics, train_model
-from src.settings import SearchSpace
 from pathlib import Path
-from ray.tune import JupyterNotebookReporter
-from ray import tune
-import torch
-import ray
 from typing import Dict
+
+import ray
+import torch
+from filelock import FileLock
+# from loguru import logger
+from ray import tune
 from ray.tune import CLIReporter
-from ray.tune.schedulers import AsyncHyperBandScheduler
+# from ray.tune import JupyterNotebookReporter
+# from ray.tune.schedulers import AsyncHyperBandScheduler
 from ray.tune.schedulers.hb_bohb import HyperBandForBOHB
 from ray.tune.search.bohb import TuneBOHB
-from loguru import logger
-from filelock import FileLock
+from src.data import make_dataset
+from src.models import metrics, rnn_models, train_model
+from src.settings import SearchSpace
 
 
-def train(config: Dict, checkpoint_dir=None):
+def train(config: Dict, checkpoint_dir: str = None) -> None:
     """
     The train function should receive a config file, which is a Dict
-    ray will modify the values inside the config before it is passed to the train 
+    ray will modify the values inside the config before it is passed to the train
     function.
     """
 
