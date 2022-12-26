@@ -3,7 +3,6 @@ from typing import Dict
 
 import ray
 import torch
-from torch.utils.data import DataLoader
 from filelock import FileLock
 
 # from loguru import logger
@@ -15,11 +14,9 @@ from ray.tune import CLIReporter
 from ray.tune.schedulers.hb_bohb import HyperBandForBOHB
 from ray.tune.search.bohb import TuneBOHB
 
-from src.data import data_tools, make_dataset
-from src.models import metrics, tokenizer, rnn_models, train_model
+from src.data import make_dataset
+from src.models import metrics, rnn_models, train_model
 from src.settings import SearchSpace
-
-
 
 
 def train(config: Dict, checkpoint_dir: str = None) -> None:
@@ -29,42 +26,38 @@ def train(config: Dict, checkpoint_dir: str = None) -> None:
     function.
     """
 
-    data_dir = config['data_dir']
-    trainpaths, testpaths = make_dataset.get_imdb_data(data_dir)
-    traindataset = data_tools.TextDataset(paths=trainpaths)
-    testdataset = data_tools.TextDataset(paths=testpaths)
+    # we lock the datadir to avoid parallel instances trying to
+    # access the datadir
+    data_dir = config["data_dir"]
+    with FileLock(data_dir / ".lock"):
+        trainloader, testloader = make_dataset.get_imdb_data(data_dir=data_dir)
 
-    corpus = []
-    for i in range(len(traindataset)):
-        x = tokenizer.clean(traindataset[i][0])
-        corpus.append(x)
-    v = tokenizer.build_vocab(corpus, max=10000)
-    len(v)
-
-    preprocessor = tokenizer.Preprocessor(max=100, vocab=v, clean=tokenizer.clean)
-    trainloader = DataLoader(
-        traindataset, collate_fn=preprocessor, batch_size=32, shuffle=True
-    )
-    testloader = DataLoader(
-        testdataset, collate_fn=preprocessor, batch_size=32, shuffle=True
-    )
-
+    # we set up the metric
     accuracy = metrics.Accuracy()
-    loss_fn = torch.nn.CrossEntropyLoss()
-    log_dir = Path("models/attention/")
+    # and create the model with the config
     model = rnn_models.AttentionNLP(config)
+
+    # and we start training.
+    # because we set tunewriter=True
+    # the trainloop wont try to report back to tensorboard,
+    # but will report back with tune.report
+    # this way, ray will know whats going on,
+    # and can start/pause/stop a loop
     model = train_model.trainloop(
-        epochs=10,
+        epochs=50,
         model=model,
-        metrics=[accuracy],
         optimizer=torch.optim.Adam,
         learning_rate=1e-3,
-        loss_fn=loss_fn,
+        loss_fn=torch.nn.CrossEntropyLoss(),
+        metrics=[accuracy],
         train_dataloader=trainloader,
         test_dataloader=testloader,
-        log_dir=log_dir,
-        train_steps=100,
-        eval_steps=25,
+        log_dir=".",
+        train_steps=len(trainloader),
+        eval_steps=len(testloader),
+        patience=5,
+        factor=0.5,
+        tunewriter=True,
     )
 
 
@@ -76,10 +69,10 @@ if __name__ == "__main__":
 
     # for AttentionNLP model config:  vocab, hidden_size, dropout, num_layers, output_size
     config = SearchSpace(
-        input_size=10002,
-        output_size=2,
+        input_size=3,
+        output_size=20,
         tune_dir=Path("models/ray").resolve(),
-        data_dir=Path("data/raw").resolve(),
+        data_dir=Path("data/external/imdb-dataset").resolve(),
     )
 
     reporter = CLIReporter()
