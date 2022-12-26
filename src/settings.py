@@ -28,6 +28,7 @@ class BaseSearchSpace(BaseModel):
 
 
 # this is what ray will use to create configs
+# toevoeging Pascal: nog voor AttentionNLP model: vocab, hidden_size, dropout, num_layers, output_size
 class SearchSpace(BaseSearchSpace):
     hidden_size: Union[int, SAMPLE_INT] = tune.randint(16, 128)
     dropout: Union[float, SAMPLE_FLOAT] = tune.uniform(0.0, 0.3)
