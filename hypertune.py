@@ -20,8 +20,6 @@ from src.models import metrics, tokenizer, rnn_models, train_model
 from src.settings import SearchSpace
 
 
-
-
 def train(config: Dict, checkpoint_dir: str = None) -> None:
     """
     The train function should receive a config file, which is a Dict
@@ -30,7 +28,8 @@ def train(config: Dict, checkpoint_dir: str = None) -> None:
     """
 
     data_dir = config['data_dir']
-    trainpaths, testpaths = make_dataset.get_imdb_data(data_dir)
+    with FileLock(data_dir / ".lock"):
+        trainpaths, testpaths = make_dataset.get_imdb_data(data_dir)
     traindataset = data_tools.TextDataset(paths=trainpaths)
     testdataset = data_tools.TextDataset(paths=testpaths)
 
