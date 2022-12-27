@@ -64,6 +64,7 @@ def train(config: Dict, checkpoint_dir: str = None) -> None:
         log_dir=log_dir,
         train_steps=100,
         eval_steps=25,
+        tunewriter=True,
     )
 
 
@@ -93,6 +94,8 @@ if __name__ == "__main__":
 
     bohb_search = TuneBOHB()
 
+    # zie documentatie:
+    # https://docs.ray.io/en/releases-1.12.1/tune/api_docs/execution.html
     analysis = tune.run(
         train,
         config=config.dict(),
