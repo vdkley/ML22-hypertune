@@ -18,6 +18,7 @@ tqdm = "^4.64.1"
 pydantic = "^1.10.2"
 hpbandster = "^0.7.4"
 torchtext = "^0.14.1"
+plotly = "^5.11.0"
 
 
 [tool.poetry.group.dev.dependencies]

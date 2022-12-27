@@ -73,8 +73,7 @@ if __name__ == "__main__":
 
     # have a look in src.settings to see how SearchSpace is created.
     # If you want to search other ranges, you change this in the settings file.
-
-    # for AttentionNLP model config:  vocab, hidden_size, dropout, num_layers, output_size
+    # for AttentionNLP model config:  vocab=input_size, hidden_size, dropout, num_layers, output_size
     config = SearchSpace(
         input_size=10002,
         output_size=2,
