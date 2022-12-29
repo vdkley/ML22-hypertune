@@ -38,26 +38,29 @@ log_dir = Path("models/attention/")
 
 from src.models import rnn_models
 
+# de best scorende uit de hypertuning
 config = {
-    "vocab": len(v),
-    "hidden_size": 128,
-    "num_layers": 3,
-    "dropout": 0.1,
+    "input_size": len(v),
+    "hidden_size": 120,
+    "num_layers": 2,
+    "dropout": 0.1658799308143347,
     "output_size": 2,
 }
 
 
 model = rnn_models.AttentionNLP(config)
 model = train_model.trainloop(
-    epochs=10,
+    epochs=100,
     model=model,
     metrics=[accuracy],
     optimizer=torch.optim.Adam,
-    learning_rate=1e-3,
+    learning_rate=0.01,
     loss_fn=loss_fn,
     train_dataloader=trainloader,
     test_dataloader=testloader,
     log_dir=log_dir,
-    train_steps=100,
-    eval_steps=25,
+    eval_steps=15,
+    train_steps=len(trainloader),
+    patience=6,
+    factor=0.5,
 )
